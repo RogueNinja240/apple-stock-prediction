@@ -1,0 +1,20 @@
+schema: '2.0'
+stages:
+  news_scrapping:
+    cmd: python src/data/scrape_news.py
+    deps:
+    - path: src/data/scrape_news.py
+      hash: md5
+      md5: 4a0a46fbf20a61f939046fca19003221
+      size: 40884
+    params:
+      params.yaml:
+        pipeline.company: Apple
+        pipeline.end_date: today
+        pipeline.start_date: '2017-01-01'
+        pipeline.ticker: AAPL
+    outs:
+    - path: data/raw/AAPL_news_data.csv
+      hash: md5
+      md5: 3a978125ba2b7c9041bc73b54a31f9ad
+      size: 221308216

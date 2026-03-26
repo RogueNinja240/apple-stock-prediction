@@ -925,36 +925,69 @@ def run():
     connectivity = check_api_connectivity()
     print_quota_status()
 
+    # We declare START_DATE as global so we can override it dynamically
+    global START_DATE 
+
     print_section("🔍 MODE DETECTION")
     mode = None
     base_df = None
+    
     if os.path.exists(OUTPUT_FILE):
         try:
             base_df = pd.read_csv(OUTPUT_FILE)
-            mode = "backfill"
-            print(f"   → STRATEGIC BACKFILL MODE (Resuming from {OUTPUT_FILE})")
-        except: pass
-    if not mode and os.path.exists(INPUT_DATASET):
-        try:
-            base_df = pd.read_csv(INPUT_DATASET)
-            mode = "backfill"
-            print(f"   → STRATEGIC BACKFILL MODE (Using {INPUT_DATASET})")
-        except: pass
+            
+            # 1. Find the absolute latest date we already have in the CSV
+            latest_date_str = base_df["Date"].max()
+            latest_date_obj = datetime.strptime(latest_date_str, "%Y-%m-%d")
+            
+            # 2. If our latest data is already today/yesterday (matching END_DATE), stop here
+            if latest_date_obj.date() >= END_DATE.date():
+                print(f"   ✅ Data is already fully up to date ({latest_date_str}). No scraping needed.")
+                return # Exits the script cleanly
+                
+            # 3. Shift the START_DATE to the day AFTER our latest collected data
+            START_DATE = latest_date_obj + timedelta(days=1)
+            mode = "incremental"
+            
+            print(f"   → INCREMENTAL MODE (Resuming from {OUTPUT_FILE})")
+            print(f"   → Scraping new delta only: {START_DATE.date()} to {END_DATE.date()}")
+        except Exception as e: 
+            print(f"   ⚠️ Could not parse existing CSV for incremental update: {e}")
+            pass
+
     if not mode:
-        print("   → BULK MODE")
+        print("   → BULK MODE (Building from scratch)")
         mode = "bulk"
 
-    if mode == "bulk":
+    # ==========================================
+    # EXECUTION
+    # ==========================================
+    if mode == "incremental":
+        # Run bulk mode, but it will only execute for the tiny new date window!
+        new_articles_dict = run_bulk_mode()
+        
+        # Format the new delta data
+        new_rows = [{"Date": d, "news_articles": " | ".join(a) if a else ""} for d, a in sorted(new_articles_dict.items())]
+        new_df = pd.DataFrame(new_rows)
+        
+        # Append the new days to the bottom of the existing historical dataset
+        final_df = pd.concat([base_df, new_df], ignore_index=True)
+        
+        # Sort chronologically to keep the file clean
+        final_df = final_df.sort_values(by="Date").drop_duplicates(subset=["Date"], keep="last")
+        
+    else: # mode == "bulk"
         articles_by_dict = run_bulk_mode()
-    else:
-        articles_by_dict = run_strategic_backfill(base_df)
+        rows = [{"Date": d, "news_articles": " | ".join(a) if a else ""} for d, a in sorted(articles_by_dict.items())]
+        final_df = pd.DataFrame(rows)
 
+    # ==========================================
+    # SAVING
+    # ==========================================
     print_section("💾 SAVING OUTPUT")
-    rows = [{"Date": d, "news_articles": " | ".join(a) if a else ""} for d, a in sorted(articles_by_dict.items())]
-    final_df = pd.DataFrame(rows)
     os.makedirs(os.path.dirname(OUTPUT_FILE), exist_ok=True)
     final_df.to_csv(OUTPUT_FILE, index=False)
-    print(f"   ✅ Saved: {OUTPUT_FILE} ({len(final_df)} rows)")
+    print(f"   ✅ Saved: {OUTPUT_FILE} ({len(final_df)} total rows)")
 
     execution_time = time.time() - start_time
     print_header("✅ COLLECTION COMPLETE")
@@ -965,6 +998,3 @@ def run():
     final_with_news = sum(1 for _, row in final_df.iterrows() if not is_effectively_empty(row["news_articles"]))
     print(f"\n📈 COVERAGE: Dates with news: {final_with_news:,}/{len(final_df):,} ({final_with_news/len(final_df)*100:.1f}%)")
     print(f"⏱️  TIME: {int(execution_time//60)}m {int(execution_time%60)}s")
-
-if __name__ == "__main__":
-    run()
