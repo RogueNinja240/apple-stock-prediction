@@ -18,3 +18,19 @@ stages:
       hash: md5
       md5: 7cf805ded033b2ad6e287cb368c2c8d9
       size: 222048168
+  data_cleaning:
+    cmd: python src/data/preprocess.py
+    deps:
+    - path: data/raw/AAPL_news_data.csv
+      hash: md5
+      md5: 7cf805ded033b2ad6e287cb368c2c8d9
+      size: 222048168
+    - path: src/data/preprocess.py
+      hash: md5
+      md5: a077db223ff3a3f64c95c5cb2bd7c2ce
+      size: 3042
+    outs:
+    - path: data/processed/AAPL_cleaned_news.csv
+      hash: md5
+      md5: f652e87904635523e41dd06514bae28b
+      size: 222031947

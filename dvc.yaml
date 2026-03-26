@@ -11,3 +11,11 @@ stages:
     outs:
       - data/raw/${pipeline.ticker}_news_data.csv:
           persist: true
+  
+  data_cleaning:
+    cmd: python src/data/preprocess.py
+    deps:
+      - src/data/preprocess.py
+      - data/raw/${pipeline.ticker}_news_data.csv
+    outs:
+      - data/processed/${pipeline.ticker}_cleaned_news.csv
