@@ -1,0 +1,36 @@
+# Core Machine Learning
+# torch
+# torchvision
+# torchaudio
+# numpy>=1.24.0
+# pandas>=2.0.0
+# scikit-learn
+# scipy
+# joblib
+
+# mlflow>=2.10.0
+# dvc
+# optuna
+
+
+# yfinance
+# ta
+# openpyxl
+# xlsxwriter
+# xlrd
+# matplotlib
+# seaborn
+# tqdm
+# pyyaml
+
+ollama
+huggingface-hub
+
+# Testing
+pytest
+pytest-cov
+
+# Misc
+ipython
+dagshub
+python-dotenv
