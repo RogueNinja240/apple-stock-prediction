@@ -998,3 +998,6 @@ def run():
     final_with_news = sum(1 for _, row in final_df.iterrows() if not is_effectively_empty(row["news_articles"]))
     print(f"\n📈 COVERAGE: Dates with news: {final_with_news:,}/{len(final_df):,} ({final_with_news/len(final_df)*100:.1f}%)")
     print(f"⏱️  TIME: {int(execution_time//60)}m {int(execution_time%60)}s")
+
+if __name__ == "__main__":
+    run()

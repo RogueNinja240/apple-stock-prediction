@@ -5,8 +5,8 @@ stages:
     deps:
     - path: src/data/scrape_news.py
       hash: md5
-      md5: 4a0a46fbf20a61f939046fca19003221
-      size: 40884
+      md5: efb3f7583c8b411cbc747dcbd6c98985
+      size: 40925
     params:
       params.yaml:
         pipeline.company: Apple
@@ -16,5 +16,5 @@ stages:
     outs:
     - path: data/raw/AAPL_news_data.csv
       hash: md5
-      md5: 3a978125ba2b7c9041bc73b54a31f9ad
-      size: 221308216
+      md5: 7cf805ded033b2ad6e287cb368c2c8d9
+      size: 222048168
