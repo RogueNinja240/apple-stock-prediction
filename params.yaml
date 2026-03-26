@@ -1,0 +1,6 @@
+pipeline:
+  ticker: "AAPL"
+  company: "Apple"
+  start_date: "2017-01-01"
+  end_date: "today"
+  

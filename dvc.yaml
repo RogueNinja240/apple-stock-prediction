@@ -1,0 +1,13 @@
+stages:
+  news_scrapping:
+    cmd: python src/data/scrape_news.py
+    deps:
+      - src/data/scrape_news.py
+    params:
+      - pipeline.ticker
+      - pipeline.company
+      - pipeline.start_date
+      - pipeline.end_date
+    outs:
+      - data/raw/${pipeline.ticker}_news_data.csv:
+          persist: true
