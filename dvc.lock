@@ -27,10 +27,10 @@ stages:
       size: 222048168
     - path: src/data/preprocess.py
       hash: md5
-      md5: a077db223ff3a3f64c95c5cb2bd7c2ce
-      size: 3042
+      md5: 6b62b7a9f2bf4787b93dc00544a9dc05
+      size: 2958
     outs:
     - path: data/processed/AAPL_cleaned_news.csv
       hash: md5
-      md5: f652e87904635523e41dd06514bae28b
-      size: 222031947
+      md5: f627834ad2bed3a2f9262f3ff48331e8
+      size: 222029537
